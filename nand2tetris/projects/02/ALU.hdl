@@ -43,4 +43,37 @@ CHIP ALU {
 
     PARTS:
    // Put you code here:
+   
+   //zero value?
+
+   Mux16(a=x, b=false, sel=zx, out = xzero);
+   Mux16(a=y, b=false, sel=zy, out = yzero);
+
+   //negate value;
+
+   Not16(in = xzero, out=xneg);
+   Not16(in = yzero, out=yneg);
+   Mux16(a=xzero, b=xneg, sel=nx, out=x1);
+   Mux16(a=yzero, b=yneg, sel=ny, out=y1);
+
+
+   // using Mux to select add or and
+
+   Add16(a=x1, b=y1, out=add1);
+   And16(a=x1, b=y1, out=and1);
+
+   Mux16(a=and1, b=add1, sel=f, out=operation);
+   
+   //negate output?
+   Not16(in=operation, out=negop);
+   Mux16(a=operation, b=negop, sel=no, out[15] = ng, out[0..7]=part1, out[8..15]=part2, out=out);
+
+
+
+   //zero result?
+
+   Or8Way(in=part1, out=or1);
+   Or8Way(in=part2, out=or2);
+   Or(a=or1, b=or2, out=orfinal);
+   Not(in=orfinal, out=zr);
 }

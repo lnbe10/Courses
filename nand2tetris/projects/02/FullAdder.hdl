@@ -14,4 +14,32 @@ CHIP FullAdder {
 
     PARTS:
     // Put you code here:
+    Xor3(a=a, b=b, c=c, out=sum);
+
+
+    //carry implementation   
+    
+    Not(in=a, out=nota);
+    Not(in=b, out=notb);
+    Not(in=c, out=notc);
+    
+    //1's of the result
+    And(a = nota, b = b, out = out1);
+    And(a = out1, b = c, out = r1);
+    
+    And(a = a, b = notb, out = out2);
+    And(a = out2, b = c, out = r2);
+
+    And(a = a, b = b, out = out3);
+    And(a = out3, b = notc, out = r3);
+
+    And(a = a, b = b, out = out4);
+    And(a = out4, b = c, out = r4);
+
+    // joining 1's with or
+    Or(a = r1, b=r2, out=or1);
+    Or(a = r3, b=r4, out=or2);
+    Or(a=or1, b=or2, out=carry);
+
+
 }
