@@ -40,4 +40,60 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+    //if A instruction-> intM[15]=0
+    //			 intM[0..14]=address
+    //if C instruction-> intM[15]=1
+    //			 intM[0..2]=jump bits
+    //			 intM[3..5]=destination bits
+    //			 intM[6..12]=comp bits
+
+    // instruction described:    
+
+    //15      12 11...6    5    4    3    2    1    0
+    // i  xx  a  ccc ccc  d1   d2   d3   j1   j2   j3
+    //store data in:       A    D    M    
+    //jump if enter value is __ 0:        <    =    >
+
+
+    //--------A Register-----------
+    // A is activated only when intM[15]=0 or intM[5]=1
+    Not(in=intM[15], out=Ainstr);
+    Or(a = Ainstr, b=intM[5], out=writeA);
+    
+    //--------D Register-----------
+    // D is activated only when intM[4]=1
+    And(a=true, b=intM[4], out=writeD);
+
+    //--------M Register-----------
+    // M is activated only when intM[3]=1
+    And(a=true, b=intM[4], out=writeM);
+
+    Mux16(a=ALUout, b=instruction, sel=?, out=newA);
+
+    Mux16(a=newA, b=intM, sel=??, out=ALUin);
+
+    PC(in=newA, load=??, inc=1,reset=reset);
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
