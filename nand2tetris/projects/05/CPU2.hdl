@@ -39,45 +39,74 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	Not(in=instruction[15],	out=isA);
-	Not(in=isA,		out=isC);
+    // Put your code here:
+    //if A instruction-> instructions[15]=0
+    //			 instructions[0..14]=address
+    //if C instruction-> instructions[15]=1
+    //			 instructions[0..2]=jump bits
+    //			 instructions[3..5]=destination bits
+    //			 instructions[6..12]=comp bits
 
+    // instruction described:    
 
+    //15      12 11...6    5    4    3    2    1    0
+    // i  xx  a  ccc ccc  d1   d2   d3   j1   j2   j3
+    //store data in:       A    D    M    
+    //jump if enter value is __ 0:        <    =    >
+    
+    // 1- A or C instruction?
 
-	Mux16(a=outA, b=inM, sel=instruction[12], out=ALUin);
-	
-	ALU(x =outD,		y =ALUin,
-	    zx=instruction[11],	nx=instruction[10],
-	    zy=instruction[9],	ny=instruction[8],
-	    f=instruction[7],	no=instruction[6],
-	    zr=zr,		ng=ng,
-	    out=ALUout
-	   );
-	
-	And(a=isC, b=instruction[4], out=loadD);
-	DRegister(in=ALUout, load=loadD, out=outD);
+   	Not(in=instruction[15], out=isA);
+    Not(in=isA, 		out=isC);
+    
+
+    // 3- refresh A register data?
 
 	And(a=isC, b=instruction[5], out=ALUtoA);
-	Mux16(a=instruction, b=ALUout, sel=ALUtoA, out=Ain);
+	Mux16(a=instruction, b=ALUout, sel=ALUtoA, out=inA);
 
 	Or(a=isA, b=ALUtoA, out=loadA);
-	ARegister(in=Ain, load=loadA, out=outA);
+	ARegister(in=inA, load=loadA, out=outA);
 
-	Or16(a=false, b=outA, out[0..14]=addressM);
-	Or16(a=false, b=ALUout, out=outM);
-	And(a=isC, b=instruction[3], out=writeM);
+    // 4- We will use A or M to compute data?
 
+	Mux16(a=outA, b=inM, sel=instruction[12] , out=inALU);
+
+
+    // 6- refresh D? 
+    // ONLY IF its a C instruction we will upload D
+    And(a=isC, b=instruction[4], out=loadD);
+    DRegister(in=ALUout, load=loadD, out=outD);
+
+    // 5- ALU
+	ALU(	x =outD,		y =inALU,
+		zx=instruction[11],	zy=instruction[9], 
+		nx=instruction[10],	ny=instruction[8],
+        	f =instruction[7],	no=instruction[6],
+        	zr=zr,			ng=ng,
+		out=ALUout
+	    );
+
+     // 2- write to M ?
+    Or16(a=false, b=outA, out[0..14]=addressM);
+    Or16(a=false, b=ALUout, out=outM);
+    And(a=isC, b=instruction[3], out=writeM);
+
+    // 7- jumps
+    Or(a=zr, b=ng, out=zeroORneg);
+    Not(in=zeroORneg, out=pos);
+
+	And(a=pos, b=instruction[0], out=jgt);
 	And(a=zr, b=instruction[1], out=jeq);
 	And(a=ng, b=instruction[2], out=jlt);
-	Or(a=ng, b=zr, out=zrorneg);
-	Not(in=zrorneg, out=pos);
-	And(a=pos, b=instruction[0], out=jgt);
+	
+	Or(a=jgt, b=jeq, out=GoE);
+	Or(a=GoE, b=jlt, out=jump);
+	
+	And(a=isC, b=jump, out=loadPC);
 
-	Or(a=jeq, b=jlt, out=jle);
-	Or(a=jle, b=jgt, out=jmp);
-
-	And(a=jmp, b=isC, out= loadPC);
+    // 7- Is it time to take load a new instruction?
 	Not(in=loadPC, out=incrPC);
-	PC(in=outA, inc=incrPC, load=loadPC, reset=reset, out[0..14]=pc);
 
-}
+	PC(in=outA, inc=incrPC, reset=reset, load=loadPC, out[0..14]=pc);
+    }
