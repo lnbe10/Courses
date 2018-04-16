@@ -59,5 +59,3 @@ def compute(s):
 				'D|M'	:'1010101',
 				};
 	return compute[s];
-
-

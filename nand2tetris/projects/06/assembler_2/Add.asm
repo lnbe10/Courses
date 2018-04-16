@@ -11,9 +11,3 @@ D=A
 D=D+A
 @0
 M=D
-@LOOP
-0;JMP
-
-(LOOP)
-@LOOP
-0;JMP
