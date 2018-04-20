@@ -1,5 +1,5 @@
-@0//comment1
-D=M//comment2
+@0
+D=M
 @INFINITE_LOOP
 D;JLE
 @counter

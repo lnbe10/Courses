@@ -7,11 +7,10 @@ lines=open('Rect.asm', 'r').read().split('\n');
 lines = [x for x in lines if x[0:2]!='//'];
 
 for i in range(len(lines)):
-	line = lines[i]
+	line = lines[i];
+	line = line.split('//')[0];
 	for j in range(len(line)):
-		if (line[j:j+2] == '//'):
-			lines[i] = line.replace(line[j:], '');
-		elif (line[j:j+2] == '\t'):
+		if (line[j:j+2] == '\t'):
 			lines[i] = line.replace(line[j:j+2], '');
 		elif (line[j] == ' '):
 			lines[i] = line.replace(line[j], '');
@@ -23,7 +22,6 @@ for i in range(len(lines)):
 	f.write(lines[i]+'\n');
 f.close()
 
-print(lines);
 
 def instruction_address_counter(lines):
 	instr_counter = [];
@@ -44,5 +42,3 @@ assembly_table = [['line', 'instructions', 'memory_address']];
 
 for i in range(len(lines)):
 	assembly_table.append([instruction_address_counter(lines)[i][0], lines[i], instruction_address_counter(lines)[i][1]]);
-
-print(assembly_table[2])

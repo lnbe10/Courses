@@ -28,25 +28,34 @@ symbols = {
 };
 
 def label_recognizer(table):
-	for i in range(len(assembly_table)):
-		line=assembly_table[i];
+	for i in range(len(table)):
+		line=table[i];
 		if line[1][0] == '(':
 			symbols[line[1][1:len(line[1])-1]] = line[2];
 	return symbols
 
-
+#some error in var_rec
 def var_recognizer(table):
-	for i in range(len(assembly_table)):
-		line = assembly_table[i];
-		if line[1][0] == '@':
-			print('ok')
-			if not_used(line[1][0][1:]):
-				symbols[line[1][1:]] = line[2];
+	free_address = 16;
+	for i in range(len(table)):
+		line = table[i];
+		if line[1][0] == '@' and is_not_number(line[1][1]) and not( used(line[1][0][1:]) ):
+			print(line[1][0][1:])
+			symbols[line[1][1:]] = free_address;
+			free_address += 1;
+
 	return symbols
 
-def not_used(symbol):
+def used(symbol):
     try: 
         symbols[symbol]
+        return True
+    except KeyError:
+        return False
+
+def is_not_number(s):
+    try:
+        float(s)
         return False
     except ValueError:
         return True
