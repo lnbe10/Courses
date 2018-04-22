@@ -36,22 +36,32 @@ def label_recognizer(table):
 
 #some error in var_rec
 def var_recognizer(table):
+	print('\nvar recognizer going...\n');
 	free_address = 16;
-	for i in range(len(table)):
+	for i in range(1, len(table)):
 		line = table[i];
-		if line[1][0] == '@' and is_not_number(line[1][1]) and not( used(line[1][0][1:]) ):
-			print(line[1][0][1:])
+
+		if line[1][0] == '@' and line[1][1].islower() and is_not_number(line[1][1]) and not_used(line[1][0][1:]) :
+			print('line: %s' %line);
+			print('starts with @? ', line[1][0]=='@');
+			print('is not a number?: %s' %is_not_number(line[1][1]));
+			print('this symbol is not used? %s' % not_used(line[1][0][1:]));
+			print('satisfied conditions...');
+			print(line[1][0][1:]);
+			print('free address is now %s' % free_address);
 			symbols[line[1][1:]] = free_address;
+			print('symbols[%s] is now: %s' % (line[1][1:], symbols[line[1][1:]]))
 			free_address += 1;
+		print('\n');
 
 	return symbols
 
-def used(symbol):
+def not_used(symbol):
     try: 
         symbols[symbol]
-        return True
-    except KeyError:
         return False
+    except KeyError:
+        return True
 
 def is_not_number(s):
     try:
@@ -68,3 +78,5 @@ symbols_table = [['Symbol', 'memory_address']];
 for i in symbols:
 	symbols_table.append([i, symbols[i]]);
 
+
+print('symbols table:\n', symbols_table);

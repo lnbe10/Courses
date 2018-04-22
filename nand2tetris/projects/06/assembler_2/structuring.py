@@ -38,7 +38,9 @@ def instruction_address_counter(lines):
 			instr_counter[i].append(counter);
 	return instr_counter;
 
-assembly_table = [['line', 'instructions', 'memory_address']];
+assembly_table = [['line', 'instructions', 'id_memory_address']];
 
 for i in range(len(lines)):
 	assembly_table.append([instruction_address_counter(lines)[i][0], lines[i], instruction_address_counter(lines)[i][1]]);
+
+print('\nassembly table:\n%s\n' % assembly_table);
